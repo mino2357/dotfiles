@@ -1,0 +1,241 @@
+    
+# users generic .tcshrc file for tcsh(1)
+#
+# Copyright (c) 1997 Daichi GOTO
+# Copyright (c) 2002 ONGS Inc.
+# All rights reserved.
+#
+# This software may be used, modified, copied, and distributed, in
+# both source and binary form provided that the above copyright and
+# these terms are retained. Under no circumstances is the author
+# responsible for the proper functioning of this software, nor does
+# the author assume any responsibility for damages incurred with its
+# use.
+
+# author: Daichi GOTO (daichi@ongs.co.jp)
+# first edition: Mon May 13 06:46:22 JST 2002
+# last modified: $Date: 2004/11/10 15:45:16 $
+# version: Revision: 1.53
+
+
+## Default shell settings
+#
+# set prompt
+#
+if (${?REMOTEHOST} || ${?SSH_CONNECTION}) then
+    set prompt="%{\033[33m%}%n@${HOST:ar:au} %/%#%{\033[m%} "
+    set prompt2="%{\033[33m%}%R%#%{\033[m%} "
+    set prompt3="%{\033[33m%}%R is correct? [y,n]:%{\033[m%} "
+else
+    set prompt="%B%n@%m%b %U%/%u%B%#%b "
+    set prompt2="%R%# "
+    set prompt3="%R is correct? [y,n]: "
+endif
+
+# a righteous umask
+#
+umask 22
+
+# do spell-word editor command before each completion attempt
+#
+set autocorrect
+
+# do expand-history editor command before each completion attempt
+#
+set autoexpand
+
+# list the possibilities after an ambiguous completion
+#
+set autolist
+
+# enable color display for ls-F and ls
+#
+set color
+
+# enable color escape sequence for NLS message files
+#
+set colorcat
+
+# do spelling-correcte of command automatically
+#
+set correct=cmd
+
+# enable display and editing Japanese(EUC) code
+#
+set dspmbyte=euc
+
+# add command to history list and erase old duplicate command 
+#
+set histdup=erase
+
+# set ^D to print message instead of exiting
+#
+set ignoreeof
+
+# list the all jobs (long format) when a job is suspended 
+#
+set listjobs=long
+
+# never beep when complete
+#
+set matchbeep=never
+
+# stop the beep
+#
+set nobeep
+
+# disable the ding in the prompt
+#
+set noding
+
+# do not error when filename or directory completion gets fail
+#
+set nonomatch
+
+# notify as soon as possible when backgroup jobs get change
+#
+set notify
+
+# ask before `rm *' command
+#
+set rmstar
+
+# treat symlinks as normal status
+#
+set symlinks=ignore
+
+
+## Keybind settings
+#
+# backward delete word binded to Ctrl-W
+#
+bindkey ^W backward-delete-word
+
+# historical backward search with linehead string binded to up-key
+#
+bindkey -k up history-search-backward
+
+# historical forward search with linehead string binded to down-key
+#
+bindkey -k down history-search-forward
+
+
+# ## Command history settings
+# #
+# set histfile=~/.history-${tty}
+# set history=500
+# set savehist=500
+# set histdup=erase
+
+# merge history files
+#
+#touch /tmp/${USER}tcshhistory$$ ${histfile}
+#chmod 600 /tmp/${USER}tcshhistory$$ ${histfile}
+#cat ~/.history* | paste - - | sort | uniq -f 1 | \
+#    awk '{print $1 "\n" substr($0, 14, length($0) - 13)}' | \
+#    tail -n ${history} \
+#    > /tmp/${USER}tcshhistory$$
+#mv /tmp/${USER}tcshhistory$$ ${histfile}
+## Command history configuration
+#
+set histfile=~/.history-"${tty:as|/|-|}"
+set history=1000
+set savehist=1000
+set histdup=erase
+ 
+# merge history files
+#
+if ( -d /usr/bin/ ) then
+    touch ~/.tcshhistory$$ "${histfile}"
+    chmod 600 ~/.tcshhistory$$ "${histfile}"
+    cat ~/.history* | paste - - | sort | uniq -f 1 | \
+        awk '{print $1 "\n" substr($0, 14, length($0) - 13)}' | \
+        tail -${history} \
+        > ~/.tcshhistory$$
+    mv ~/.tcshhistory$$ "${histfile}"
+endif 
+
+## Completion settings
+#
+complete cd p/1/d/
+
+complete where 'n/*/c/'
+complete which 'n/*/c/'
+
+complete {j,}man 'n/*/c/'
+
+complete alias 'n/*/a/'
+complete unalias 'n/*/a/'
+
+complete set 'p/1/s/=' 'c/*=/f/' 'n/=/f/'
+complete unset 'n/*/s/'
+
+complete setenv 'p/1/e/' 'c/*:/f/'
+complete unsetenv 'n/*/e/'
+
+complete printenv 'n/*/e/'
+
+complete env 'p/1/e/=' 'c/*=/f/' 'n/=/f/' 'c/*:/f/' 'n/*/c/'
+complete rtprio 'p/1/`jot 32 0`/' 'p/2/c/'
+
+
+## Alias settings
+#
+alias j jobs -l
+
+alias ls ls -G -w
+alias la ls -a
+alias lf ls -F
+alias ll ls -lh
+
+alias du du -h
+alias df df -h
+
+alias su su -l
+
+# # terminal settings
+# #
+# if ( ${?TERM} ) then
+#     switch ( ${TERM} )
+#     case kterm:
+#         # set TERM environment variable for colorized ls
+#         setenv TERM ${TERM}-color
+
+#     case kterm-color:
+#         # set BackSpace control character
+#         stty erase 
+
+#     case xterm:
+#         # set terminal title
+#         alias postcmd echo -n '"]2;${TERM:s/-/./:r} ${HOST:ar}:${cwd}"'
+
+#         breaksw
+#     case cons25:
+#         unsetenv LANG
+#         breaksw
+#     endsw
+# endif
+
+# if ( ${?COLORTERM} ) then
+#     unsetenv LS_COLORS 
+#     unsetenv LSCOLORS
+# else
+#     setenv LS_COLORS \
+#         'no=0:fi=0:di=01;32:ln=01;35:pi=33:so=01;33:bd=34:cd=36:ex=01;31'
+#     setenv LSCOLORS CxFxDxdxBxexgxBxBx
+# endif
+
+
+
+set implicitcd=verbose
+
+if ( $TERM == xterm ) then
+        alias precmd 'printf "\033]0;$PWD\007"'
+
+        #set prompt="%{\033]0;%n@%M: %c\007%}$prompt"
+endif
+
+## load user .tcshrc configuration file
+    #
+    
+if ( -f ~/.tcshrc.mine ) source ~/.tcshrc.mine
